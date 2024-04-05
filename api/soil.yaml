@@ -1,0 +1,271 @@
+openapi: '3.0.3'
+info:
+  title: Food Production Common API
+  description: Food Production Common API based on Reference Architectural Model Industrie 4.0 (RAMI 4.0)
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/
+paths:
+  /soil/nutrients:
+    post:
+      summary: Soil nutrient measurement event
+      description: |
+          Raw sensor payment received in the integration layer and converted into 
+          this common model to generate an event for the information layer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Nutrient'
+            examples:
+              NutrientExample:
+                $ref: '#/components/examples/NutrientExample'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Nutrient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Nutrient'
+      responses:
+        '201':
+          description: Event successfully sent
+  /soil/conditions:
+    post:
+      summary: Soil conditions measurement event
+      description: |
+        Raw sensor payment received in the integration layer and converted into 
+        this common model to generate an event for the information layer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Condition'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Condition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Condition'
+      responses:
+        '201':
+          description: Event successfully sent
+
+  /soil/compositions:
+    post:
+      summary: Soil composition measurement event
+      description: |
+        Raw sensor payment received in the integration layer and converted into 
+        this common model to generate an event for the information layer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Composition'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Composition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Composition'
+      responses:
+        '201':
+          description: Event successfully sent
+  /weather/temperature:
+    post:
+      summary: Soil composition measurement event
+      description: |
+        Raw sensor payment received in the integration layer and converted into 
+        this common model to generate an event for the information layer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Temperature'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Temperature'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Temperature'
+      responses:
+        '201':
+          description: Event successfully sent
+  /weather/precipitation:
+    post:
+      summary: Soil composition measurement event
+      description: |
+        Raw sensor payment received in the integration layer and converted into 
+        this common model to generate an event for the information layer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Precipitation'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Precipitation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Precipitation'
+      responses:
+        '201':
+          description: Event successfully sent
+components:
+  schemas:
+    Header:
+      type: object
+      properties:
+        sensorId:
+          type: string
+          format: uuid
+        time:
+          type: string
+          format: date-time
+        fieldId:
+          type: string
+          format: uuid
+        farmId:
+          type: string
+          format: uuid
+    Nutrient:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/Header'
+        phosphorus:
+          type: number
+          format: ppm
+        nitrogen:
+          type: number
+          format: ppm
+        potassium:
+          type: number
+          format: ppm
+        calcium:
+          type: number
+          format: ppm
+        magnesium:
+          type: number
+          format: ppm
+        sulfur:
+          type: number
+          format: ppm
+        salt:
+          type: number
+          format: dS/m
+          description: |
+            Soil salinity is measured in units of electrical conductivity (EC), which is also known as Siemens (S).
+            The most common units of EC are deciSiemens per meter (dS/m)
+        zinc:
+          type: number
+          format: ppm
+        iron:
+          type: number
+          format: ppm
+    Composition:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/Header'
+        organicMass:
+          type: number
+          minimum: 0
+          maximum: 100
+          format: '%'
+          description: biomass as a % of soil
+        heavyMetals:
+          type: number
+          format: ug/kg or ppb
+        microbialActivity:
+          type: number
+          format: mg/kg
+        granularity:
+          type: number
+          format: '%'
+          description: |
+            Percentage of fine grains to weight
+            Higher percentage of file grains means the soil is more cohesive (more clay).
+            Lower % of fine grains mean the soil is more granular
+        soilType:
+          type: string
+          enum: [ Gravel, Very coarse, Coarse, Medium, Fine, Very fine, ]
+          description: |
+            Gravel: >2.0mm
+            Very coarse: 1.0 - 2.0mm
+            Coarse: 0.50 - 1.0mm
+            Medium: 0.25 - 0.50mm
+            Fine: 0.10 - 0.25mm
+            Very fine: 0.05 - 0.10mm
+    Condition:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/Header'
+        soilHumidity:
+          type: number
+          minimum: 0
+          maximum: 100
+          format: '%'
+          description: Volumetric water content
+        ph:
+          type: number
+          minimum: 0
+          maximum: 14
+        sunlight:
+          type: number
+          format: W/m^2
+        temperature:
+          type: number
+          format: °C
+    Temperature:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/Header'
+        timing:
+          type: string
+          format: date-time
+        level:
+          type: number
+        duration:
+          type: number
+    Precipitation:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/Header'
+        timing:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        duration:
+          type: number
+        distribution:
+          type: string
+        evaporation:
+          type: number
+        intensity:
+          type: string
+        variability:
+          type: string
+  examples:
+    NutrientExample:
+      value: {
+        "header": {
+          "sensorId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "time": "2024-03-27T17:33:31.482Z",
+          "fieldId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        },
+        "phosphorus": 5,
+        "nitrogen": 12,
+        "potassium": 8,
+        "calcium": 8,
+        "magnesium": 5,
+        "sulfur": 1,
+        "salt": 12,
+        "zinc": 2,
+        "iron": 4
+      }
+
+
