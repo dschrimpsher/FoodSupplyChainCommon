@@ -7,6 +7,15 @@ servers:
   - url: http://localhost:8000/
 paths:
   /soil/nutrients:
+    get:
+      responses:
+        '200':
+          description: 'Example'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Nutrient'
+
     post:
       summary: Soil nutrient measurement event
       description: |
@@ -134,34 +143,41 @@ components:
           $ref: '#/components/schemas/Header'
         phosphorus:
           type: number
-          format: ppm
+          description: ppm
         nitrogen:
           type: number
-          format: ppm
+          description: ppm
         potassium:
           type: number
-          format: ppm
+          description: ppm
         calcium:
           type: number
-          format: ppm
+          description: ppm
         magnesium:
           type: number
-          format: ppm
+          description: ppm
         sulfur:
           type: number
-          format: ppm
+          description: ppm
         salt:
           type: number
-          format: dS/m
           description: |
             Soil salinity is measured in units of electrical conductivity (EC), which is also known as Siemens (S).
             The most common units of EC are deciSiemens per meter (dS/m)
+        cationExchangeCapacity:
+          type: number
+          description: |
+            moving ions in the soil based on how much salt and how much water is in the soil.
         zinc:
           type: number
-          format: ppm
+          description: ppm
         iron:
           type: number
-          format: ppm
+          description: ppm
+        nutrientDeficiency:
+          type: array
+          items:
+            type: string
     Composition:
       type: object
       properties:
@@ -171,22 +187,17 @@ components:
           type: number
           minimum: 0
           maximum: 100
-          format: '%'
           description: biomass as a % of soil
         heavyMetals:
           type: number
-          format: ug/kg or ppb
-        microbialActivity:
-          type: number
-          format: mg/kg
+          description: ug/kg or ppb
         granularity:
           type: number
-          format: '%'
           description: |
             Percentage of fine grains to weight
             Higher percentage of file grains means the soil is more cohesive (more clay).
             Lower % of fine grains mean the soil is more granular
-        soilType:
+        soilGranularityType:
           type: string
           enum: [ Gravel, Very coarse, Coarse, Medium, Fine, Very fine, ]
           description: |
@@ -196,6 +207,13 @@ components:
             Medium: 0.25 - 0.50mm
             Fine: 0.10 - 0.25mm
             Very fine: 0.05 - 0.10mm
+        clay:
+          type: number
+          description: % of soil is clay
+        sand:
+          type: number
+        silt:
+          type: number
     Condition:
       type: object
       properties:
@@ -205,7 +223,6 @@ components:
           type: number
           minimum: 0
           maximum: 100
-          format: '%'
           description: Volumetric water content
         ph:
           type: number
@@ -213,10 +230,12 @@ components:
           maximum: 14
         sunlight:
           type: number
-          format: W/m^2
-        temperature:
+          description: W/m^2
+        soilTemperature:
           type: number
-          format: °C
+          description: °C
+        waterDeficiency:
+          type: number
     Temperature:
       type: object
       properties:
@@ -225,10 +244,23 @@ components:
         timing:
           type: string
           format: date-time
-        level:
+        dailyAirTempertaure:
           type: number
+          description: maximum air temperature of the day in Celius
         duration:
           type: number
+        minimalAirTemperatureSeason:
+          type: number
+          description: minimum air temperature recorded during the growing season in Celius .
+        maximumAirTemperatureSeason:
+          type: number
+          description: maximum air temperature recorded during the growing season in Celius .
+        averageAirTemperatureSeason:
+          type: number
+          description: average air temperature recorded during the growing season in Celius .
+        growingDegreeDays:
+          type: number
+          description: number of days in the seasons above the growing threshold for the crop.
     Precipitation:
       type: object
       properties:
@@ -243,12 +275,66 @@ components:
           type: number
         distribution:
           type: string
-        evaporation:
+        evapotranspiration:
           type: number
         intensity:
           type: string
         variability:
           type: string
+        daysSinceLastPrecepitation:
+          type: number
+        totalRainyDaysInSeason:
+          type: number
+        averageRainyDaysInSeason:
+          type: number
+        averagePotentialEvapotranspiration:
+          type: number
+        averageVaporPresureDeficit:
+          type: number
+    Plant:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/Header'
+        weedSpatialOccurance:
+          type: number
+          description: average distance
+        plantSpatialArrangement:
+          type: number
+          description: average distance
+        outcrossingAndSelfPollination:
+          type: string
+          enum: [ CROSS, SELF, BOTH ]
+        cloneSize:
+          type: number
+        fruitSet:
+          type: number
+          description: days
+    Animal:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/Header'
+        beeComposition:
+          type: array
+          items:
+            type: object
+            properties:
+              beeType:
+                type: string
+              beeTypePercentage:
+                type: number
+        beeDensity:
+          type: number
+        beneficialInsectComposition:
+          type: number
+        harmfulInsectComposition:
+          type: number
+        diseasePrevalence:
+          type: number
+        microbialActivity:
+          type: number
+          description: mg/kg
   examples:
     NutrientExample:
       value: {
